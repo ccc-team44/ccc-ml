@@ -36,4 +36,7 @@ db.create_document(new_view)
 results = db.get_view_result(new_view['_id'], 'ml')
 
 for result in results:
-	print(result)
+	try:
+		print(result)
+	except Exception:
+		pass
