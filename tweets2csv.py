@@ -1,5 +1,6 @@
 import os
 import time
+import csv
 
 from cloudant.client import CouchDB
 
@@ -10,10 +11,10 @@ db_host = "http://127.0.0.1:5984"
 
 tweetMap= None
 with open('map.js', 'r') as file:
-    tweetMap = file.read().replace('\n', '')
-	
+	tweetMap = file.read().replace('\n', '')
+
 print(tweetMap)
-	
+
 client = CouchDB(user, password, url=db_host, connect=True)
 session = client.session()
 print('Databases: {0}'.format(client.all_dbs()))
@@ -35,8 +36,9 @@ db.create_document(new_view)
 
 results = db.get_view_result(new_view['_id'], 'ml')
 
-for result in results:
-	try:
-		print(result)
-	except Exception:
-		pass
+with open('out.csv', 'w', newline='') as csvfile:
+	writer = csv.writer(csvfile, delimiter=',')
+	for result in results:
+		text = result["value"]["text"].encode('unicode_escape').decode("utf-8")
+		writer.writerow([result["key"], text])
+
