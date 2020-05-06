@@ -1,8 +1,4 @@
-function(doc) {
-  if( doc.text) {
-    emit(doc._id, {
-        text: doc.text,
-        screen_name: doc.screen_name
-    });
-  }
+function (doc) {
+  emit(doc.user.id,
+    {followers: doc.user.followers_count});
 }

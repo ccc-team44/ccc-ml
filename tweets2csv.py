@@ -13,6 +13,9 @@ tweetMap= None
 with open('map.js', 'r') as file:
 	tweetMap = file.read().replace('\n', '')
 
+tweetReduce = None
+with open('reduce.js', 'r') as file:
+	tweetReduce = file.read().replace('\n', '')
 print(tweetMap)
 
 client = CouchDB(user, password, url=db_host, connect=True)
@@ -25,7 +28,8 @@ new_view = {
 	'_rev': 'rev-code',
 	'views': {
 		'ml': {
-			'map': f'''{tweetMap}'''
+			'map': f'''{tweetMap}''',
+			'reduce': f'''{tweetReduce}''',
 		}
 	},
 	'language': 'javascript'
@@ -34,11 +38,13 @@ new_view = {
 # create new view like a doc
 db.create_document(new_view)
 
-results = db.get_view_result(new_view['_id'], 'ml')
+results = db.get_view_result(new_view['_id'], 'ml', group=True)
 
-with open('out.csv', 'w', newline='') as csvfile:
-	writer = csv.writer(csvfile, delimiter=',')
-	for result in results:
-		text = result["value"]["text"].encode('unicode_escape').decode("utf-8")
-		writer.writerow([result["key"], text])
+
+for result in results:
+	try:
+		print(result)
+	except Exception as e:
+		print(e)
+		pass
 
